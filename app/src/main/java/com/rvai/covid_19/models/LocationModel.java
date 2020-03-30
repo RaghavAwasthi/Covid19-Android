@@ -3,6 +3,7 @@ package com.rvai.covid_19.models;
 import java.io.Serializable;
 
 public class LocationModel implements Serializable {
+    long timestamp;
     double lat,lon;
 
     public LocationModel() {

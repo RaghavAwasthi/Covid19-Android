@@ -1,5 +1,6 @@
 package com.rvai.covid_19.quarantine;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Spinner;
@@ -13,6 +14,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.rvai.covid_19.Constants;
 import com.rvai.covid_19.R;
 import com.rvai.covid_19.models.AssesmentModel;
 import com.rvai.covid_19.utils.Utils;
@@ -25,6 +27,8 @@ public class AssesmentActivity extends AppCompatActivity implements View.OnClick
     TextInputEditText bodytemp;
     Spinner units;
     AssesmentModel assesmentModel;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
     static FirebaseDatabase db = FirebaseDatabase.getInstance();
 
 
@@ -44,6 +48,8 @@ public class AssesmentActivity extends AppCompatActivity implements View.OnClick
         breathing_yes.setOnClickListener(this);
         breathing_no.setOnClickListener(this);
         bodytemp=findViewById(R.id.body_temp);
+        preferences=getSharedPreferences(Constants.APP_PREFERENCE_NAME,MODE_PRIVATE);
+        editor=preferences.edit();
 
     }
 
@@ -107,6 +113,7 @@ public class AssesmentActivity extends AppCompatActivity implements View.OnClick
                 @Override
                 public void onSuccess(Void aVoid) {
                     Toast.makeText(AssesmentActivity.this, "Data Submitted Successfully", Toast.LENGTH_SHORT).show();
+                    editor.putLong(Constants.LASTASSESMENT,Utils.getCurrentDateTime());
                 }
             });
 

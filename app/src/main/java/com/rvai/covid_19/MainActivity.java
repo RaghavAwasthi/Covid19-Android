@@ -1,9 +1,16 @@
 package com.rvai.covid_19;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +36,11 @@ import com.rvai.covid_19.profile.ProfileFragment;
 import com.rvai.covid_19.quarantine.AssesmentActivity;
 import com.rvai.covid_19.quarantine.QuarantineFragment;
 import com.rvai.covid_19.status.StatusFragment;
+import com.rvai.covid_19.utils.Utils;
 
+import org.threeten.bp.LocalDateTime;
+
+import java.util.Calendar;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -71,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ds = new DataStore(getApplicationContext());
+        createNotificationChannel();
         bar = findViewById(R.id.toolbar);
         setSupportActionBar(bar);
         navigationView = findViewById(R.id.nav_view);
@@ -87,8 +99,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), AssesmentActivity.class);
-                startActivity(i);
+                Intent i = new Intent(getApplicationContext(), AssesmentReminderBroadcast.class);
+                PendingIntent intent=PendingIntent.getBroadcast(MainActivity.this,0,i,0);
+                AlarmManager manager1=(AlarmManager) getSystemService(ALARM_SERVICE);
+                long cal= System.currentTimeMillis();
+                long tenseconds=1000*10;
+
+
+                manager1.setRepeating(AlarmManager.RTC_WAKEUP,cal,tenseconds,intent);
+
             }
         });
 
@@ -123,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void selectInitialNavigationItem() {
+
         int initialItem = R.id.nav_home;
         onNavigationItemSelected(navigationView.getMenu().findItem(initialItem));
         navigationView.setSelectedItemId(initialItem);
@@ -254,6 +274,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             case R.id.nav_quarantine:
                 NavItem = MainActivityViewModel.NavigationItem.QUARANTINE;
                 break;
+        }
+    }
+
+    public void createNotificationChannel()
+    {
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)
+        {
+            CharSequence name=Constants.CHANNELID;
+            String description="Channel to show reminder to take assesment";
+            int importance= NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel=new NotificationChannel(Constants.CHANNELID,name,importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager=    getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
         }
     }
 }

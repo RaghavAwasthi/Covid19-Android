@@ -18,6 +18,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.chip.Chip;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.rvai.covid_19.MainActivity;
@@ -55,18 +56,32 @@ public class QuarantineFragment extends MainFragment {
                 startActivity(i);
             }
         });
-        Query query = FirebaseDatabase.getInstance().getReference().child("advisory").orderByChild("timestamp");
+        Query query = FirebaseDatabase.getInstance().getReference().child("assesment").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).orderByChild("timestamp");
         FirebaseRecyclerOptions<AssesmentModel> options = new FirebaseRecyclerOptions.Builder<AssesmentModel>().setQuery(query, AssesmentModel.class)
                 .setLifecycleOwner(this)
                 .build();
 
-        FirebaseRecyclerAdapter<AdvisoryModel,QuarantineViewHolder> adapter = new FirebaseRecyclerAdapter<AssesmentModel, QuarantineViewHolder>(options) {
+        FirebaseRecyclerAdapter<AssesmentModel, QuarantineViewHolder> adapter = new FirebaseRecyclerAdapter<AssesmentModel, QuarantineViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull QuarantineViewHolder holder, int position, @NonNull AssesmentModel model) {
                 holder.date.setText(Utils.getDateTime(model.getTimestamp()));
-                holder.bodytemp.setText(model.getBodytemp());
-                holder.cough.setText(model);
-                Glide.with(getContext()).load(model.getUrl()).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.imageView);
+                holder.bodytemp.setText(Integer.toString(model.getBodytemp()));
+                if (model.getCough() == 0)
+                    holder.cough.setText("NO");
+                else
+                    holder.cough.setText("YES");
+
+                if (model.getFever() == 0)
+                    holder.fever.setText("NO");
+                else
+                    holder.fever.setText("YES");
+
+                if (model.getBreathingdifficulty() == 0)
+                    holder.breathingproblem.setText("NO");
+                else
+                    holder.breathingproblem.setText("YES");
+
+
             }
 
             @NonNull
@@ -82,8 +97,6 @@ public class QuarantineFragment extends MainFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-
-
         return view;
     }
 
@@ -91,15 +104,18 @@ public class QuarantineFragment extends MainFragment {
     public int getTitle() {
         return R.string.title_quarantine;
     }
-    class QuarantineViewHolder extends RecyclerView.ViewHolder{
-        AppCompatTextView date,bodytemp,fever,cough,breathingproblem;
+
+    class QuarantineViewHolder extends RecyclerView.ViewHolder {
+        AppCompatTextView date, bodytemp, fever, cough, breathingproblem;
 
 
         public QuarantineViewHolder(@NonNull View itemView) {
             super(itemView);
-            date=itemView.findViewById(R.id.assesment_date);
-            bodytemp=itemView.findViewById(R.id.body_temperature);
-            fever=itemView.findViewById(R.id.fever);
+            date = itemView.findViewById(R.id.assesment_date);
+            bodytemp = itemView.findViewById(R.id.body_temperature);
+            fever = itemView.findViewById(R.id.fever);
+            cough=itemView.findViewById(R.id.cough);
+            breathingproblem=itemView.findViewById(R.id.breathingprob);
 
         }
     }

@@ -14,7 +14,14 @@ public class Constants {
     public static final String DEATHCOUNT = "DEATHCOUNT";
     public static final String TOTALCOUNT = "TOTALCOUNT";
     public static final String APIURL = "TOTALCOUNT";
-
+    public static final String MOID = "MOID";
+    public static final String CHANNELID="ASSESMENT_REMINDER";
+    public static final String LASTASSESMENT="LASTASSESMENT";
+    public static final String ASSESMENTDAY="ASSESMENTDAY";
+    public static final String P= "P";
+    public static final String Q= "Q";
+    public static final String R= "R";
+    public static final String S= "S";
 
 
 
